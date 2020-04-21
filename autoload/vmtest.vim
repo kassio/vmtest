@@ -9,13 +9,11 @@ let s:reserved_keys = [
       \ ]
 
 function! vmtest#load()
-  let g:vmtests =  {}
+  let g:vmtests =  { '_errors': [] }
 endfunction
 
 function! vmtest#run(...)
   runtime vmtest/**/*.vim
-
-  let g:vmtests._errors = []
 
   let l:tests = a:0 ? g:vmtests[a:1] : g:vmtests
 
