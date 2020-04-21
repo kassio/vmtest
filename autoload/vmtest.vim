@@ -1,3 +1,15 @@
+if exists('g:loaded_plug')
+  finish
+endif
+let g:loaded_plug = 1
+
+function! vmtest#load()
+  let g:vmtests =  {}
+endfunction
+
+command! -nargs=? VMTestRun call vmtest#run(<f-args>)
+command! VMTestQuit call vmtest#quit()
+
 let s:reserved_keys = [
       \ '_errors',
       \ '_name',
