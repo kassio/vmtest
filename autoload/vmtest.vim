@@ -9,12 +9,13 @@ let s:reserved_keys = [
       \ ]
 
 function! vmtest#load()
-  let g:vmtests =  { '_errors': [] }
+  let g:vmtests =  {}
 endfunction
 
 function! vmtest#run(...)
   runtime vmtest/**/*.vim
 
+  let g:vmtests._errors = []
   let l:tests = a:0 ? g:vmtests[a:1] : g:vmtests
 
   for scope in keys(l:tests)
@@ -27,7 +28,7 @@ function! vmtest#run(...)
 endfunction
 
 function! vmtest#quit()
-  if empty(get(g:vmtests, '_errors', []))
+  if empty(g:vmtests._errors)
     qall!
   else
     cquit
