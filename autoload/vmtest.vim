@@ -1,9 +1,16 @@
+command -nargs=? VMTestRun call vmtest#run(<f-args>)
+command VMTestQuit call vmtest#quit()
+
 let s:reserved_keys = [
       \ '_errors',
       \ '_name',
       \ '_before',
       \ '_after'
       \ ]
+
+function! vmtest#load()
+  let g:vmtests =  {}
+endfunction
 
 function! vmtest#run(...)
   runtime vmtest/**/*.vim
