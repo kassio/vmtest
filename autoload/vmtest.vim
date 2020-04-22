@@ -9,7 +9,7 @@ function! vmtest#plugin(name)
   if !exists('g:vmtests')
     let g:vmtests =  {}
   end
-  if !exists(printf('g:vmtests.%s', a:name))
+  if !has_key(g:vmtests, a:name)
     let g:vmtests[a:name] =  {}
   end
 endfunction
@@ -25,7 +25,7 @@ function! vmtest#run(...)
       continue
     end
 
-    call s:scope(scope, l:tests[scope], 1)
+    call s:scope(scope, l:tests[scope], 0)
   endfor
 endfunction
 
@@ -38,9 +38,11 @@ function! vmtest#quit()
 endfunction
 
 function! s:scope(name, dict, level)
+  let l:marker = a:level == 0 ? '=' : '-'
   echon printf(
-        \ "-%s %s\n",
-        \ repeat('>', a:level),
+        \ "%s%s> %s\n",
+        \ repeat(' ', a:level),
+        \ l:marker,
         \ get(a:dict, '_name', a:name)
         \ )
 
@@ -70,7 +72,7 @@ function! s:execute_callback(dict, name)
 endfunction
 
 function! s:execute_test(name, Fn, level)
-  echon printf('>%s %s: ', repeat('>', a:level), a:name)
+  echon printf('%s» %s: ', repeat(' ', a:level), a:name)
   let v:errors = []
 
   call a:Fn()
@@ -81,7 +83,7 @@ function! s:execute_test(name, Fn, level)
     echon "Failed\n"
     for error in v:errors
       call add(g:vmtests._errors, error)
-      echon printf("%s» %s\n", repeat(' ', a:level), matchstr(error, ': \zs.*'))
+      echon printf("%s  %s\n", repeat(' ', a:level), matchstr(error, ': \zs.*'))
     endfor
   end
 endfunction
