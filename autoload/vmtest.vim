@@ -1,6 +1,3 @@
-command! -nargs=? VMTestRun call vmtest#run(<f-args>)
-command! VMTestQuit call vmtest#quit()
-
 let s:reserved_keys = [
       \ '_errors',
       \ '_name',
@@ -8,8 +5,13 @@ let s:reserved_keys = [
       \ '_after'
       \ ]
 
-function! vmtest#load()
-  let g:vmtests =  {}
+function! vmtest#plugin(name)
+  if !exists('g:vmtests')
+    let g:vmtests =  {}
+  end
+  if !exists(printf('g:vmtests.%s', a:name))
+    let g:vmtests[a:name] =  {}
+  end
 endfunction
 
 function! vmtest#run(...)
@@ -79,7 +81,7 @@ function! s:execute_test(name, Fn, level)
     echon "Failed\n"
     for error in v:errors
       call add(g:vmtests._errors, error)
-      echon printf(">>> %s\n", error)
+      echon printf("%s» %s\n", repeat(' ', a:level), matchstr(error, ': \zs.*'))
     endfor
   end
 endfunction
