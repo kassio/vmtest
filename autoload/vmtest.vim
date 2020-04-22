@@ -74,6 +74,11 @@ function! s:execute_callback(dict, name)
 endfunction
 
 function! s:execute_test(name, Fn, level)
+  if type(a:Fn) != v:t_func
+    echoe printf('"%s" is a %s, it should be a function', a:name, s:type_name(a:Fn))
+    cquit
+  end
+
   echon printf('%s» %s: ', repeat(' ', a:level), a:name)
   let v:errors = []
 
@@ -88,4 +93,19 @@ function! s:execute_test(name, Fn, level)
       echon printf("%s  %s\n", repeat(' ', a:level), matchstr(error, ': \zs.*'))
     endfor
   end
+endfunction
+
+function! s:type_name(value)
+  let types = [
+        \ 'number',
+        \ 'string',
+        \ 'function',
+        \ 'list',
+        \ 'dictionary',
+        \ 'float',
+        \ 'boolean',
+        \ 'null'
+        \ ]
+
+  return types[type(a:value)]
 endfunction
