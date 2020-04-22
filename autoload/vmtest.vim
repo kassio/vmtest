@@ -15,7 +15,9 @@ function! vmtest#plugin(name)
 endfunction
 
 function! vmtest#run(...)
-  runtime vmtest/**/*.vim
+  for test_file in globpath(&runtimepath, 'vmtest/**/*.vim', v:false, v:true)
+    execute printf('source %s', test_file)
+  endfor
 
   let g:vmtests._errors = []
   let l:tests = a:0 ? g:vmtests[a:1] : g:vmtests
