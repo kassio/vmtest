@@ -7,7 +7,7 @@ let s:reserved_keys = [
       \ '_after'
       \ ]
 
-function! vmtest#plugin(name)
+function! vmtest#plugin(name) abort
   if !exists('g:vmtests')
     let g:vmtests =  {}
   end
@@ -16,7 +16,7 @@ function! vmtest#plugin(name)
   end
 endfunction
 
-function! vmtest#run(...)
+function! vmtest#run(...) abort
   for test_file in globpath(&runtimepath, 'vmtest/**/*.vim', v:false, v:true)
     execute printf('source %s', test_file)
   endfor
@@ -41,7 +41,7 @@ function! vmtest#run(...)
   endfor
 endfunction
 
-function! vmtest#quit()
+function! vmtest#quit() abort
   if empty(g:vmtests._errors)
     qall!
   else
@@ -49,7 +49,7 @@ function! vmtest#quit()
   end
 endfunction
 
-function! s:scope(name, dict, level)
+function! s:scope(name, dict, level) abort
   echo s:title(a:name, a:level)
 
   for key in keys(a:dict)
@@ -65,7 +65,7 @@ function! s:scope(name, dict, level)
   endfor
 endfunction
 
-function! s:title(name, level)
+function! s:title(name, level) abort
   let marker = a:level == 0 ? '=' : '-'
   return printf(
         \ "%s%s> %s\n",
@@ -75,19 +75,19 @@ function! s:title(name, level)
         \ )
 endfunction
 
-function! s:execute(key, dict, level)
+function! s:execute(key, dict, level) abort
   call s:execute_callback(a:dict, '_before')
   call s:execute_test(a:key, a:dict[a:key], a:level)
   call s:execute_callback(a:dict, '_after')
 endfunction
 
-function! s:execute_callback(dict, name)
+function! s:execute_callback(dict, name) abort
   if has_key(a:dict, a:name)
     call a:dict[a:name]()
   end
 endfunction
 
-function! s:execute_test(name, Fn, level)
+function! s:execute_test(name, Fn, level) abort
   if type(a:Fn) != v:t_func
     echo s:error(
           \ a:level,
@@ -119,15 +119,15 @@ function! s:execute_test(name, Fn, level)
   end
 endfunction
 
-function! s:result(level, name, result)
+function! s:result(level, name, result) abort
   return printf('%s » %s: %s', repeat(' ', a:level), a:name, a:result)
 endfunction
 
-function! s:error(level, message, ...)
+function! s:error(level, message, ...) abort
   return call('printf', ['%s ! '.a:message, repeat(' ',a:level)] + a:000)
 endfunction
 
-function! s:type_name(value)
+function! s:type_name(value) abort
   let types = [
         \ 'number',
         \ 'string',
