@@ -25,24 +25,39 @@ On your plugin you create a `vmtest` folder with a test file like:
 * tests
 
 ```vimscript
-call vmtest#plugin('plugin')
-let g:vmtests.plugin.first_scope = {}
+" Setup the vmtest for the given plugin
+call vmtest#plugin('vmtest')
 
-function! g:vmtests.plugin.first_scope._before()
-  echo 'call back to run before each test'
+" Scope without a custom name
+" The scope key will be used as its name
+let g:vmtests.vmtest.first_scope = {}
+
+" Similar to the `setup` of some test libraries
+function! g:vmtests.vmtest.first_scope._before()
+  echo "call back to run before each test\n"
+  let self.context_var = 'foo'
 endfunction
 
-function! g:vmtests.plugin.first_scope._after()
-  echo 'call back to run after each test'
+" Similar to the `teardown` of some test libraries
+function! g:vmtests.vmtest.first_scope._after()
+  echo "call back to run after each test\n"
 endfunction
 
-function! g:vmtests.plugin.first_scope.test_foo()
-  call assert_equal(1, 2)
+" A test function on the `first_scope` scope
+function! g:vmtests.vmtest.first_scope.test_foo()
+  call assert_equal(self.context_var, 2)
 endfunction
 
-let g:vmtests.plugin.second_scope = { '_name': 'My Other Scope' }
+" A test function on the `first_scope` scope
+function! g:vmtests.vmtest.first_scope.test_bar()
+  call assert_notequal(self.context_var, 2)
+endfunction
 
-function! g:vmtests.plugin.second_scope.test_bar()
+" Scope with a custom name
+let g:vmtests.vmtest.second_scope = { '_name': 'My Other Scope' }
+
+" A test function on the `second_scope` scope
+function! g:vmtests.vmtest.second_scope.test_bar()
   call assert_equal(1, 1)
 endfunction
 ```
@@ -50,13 +65,17 @@ endfunction
 * output
 
 ```text
--> first_scope
+=> vmtest
+ -> first_scope
 call back to run before each test
->> test_foo: Failed
- » Expected 1 but got 2
+  » test_bar: Success
 call back to run after each test
--> My Other Scope
->> test_bar: Success
+call back to run before each test
+  » test_foo: Failed
+  ! Expected 'foo' but got 2
+call back to run after each test
+ -> second_scope
+  » test_bar: Success
 ```
 
 # Contribution

@@ -8,6 +8,7 @@ let g:vmtests.vmtest.first_scope = {}
 " Similar to the `setup` of some test libraries
 function! g:vmtests.vmtest.first_scope._before()
   echo "call back to run before each test\n"
+  let self.context_var = 'foo'
 endfunction
 
 " Similar to the `teardown` of some test libraries
@@ -17,7 +18,12 @@ endfunction
 
 " A test function on the `first_scope` scope
 function! g:vmtests.vmtest.first_scope.test_foo()
-  call assert_equal(1, 2)
+  call assert_equal(self.context_var, 2)
+endfunction
+
+" A test function on the `first_scope` scope
+function! g:vmtests.vmtest.first_scope.test_bar()
+  call assert_notequal(self.context_var, 2)
 endfunction
 
 " Scope with a custom name
