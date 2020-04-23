@@ -7,13 +7,13 @@ let g:vmtests.vmtest.first_scope = {}
 
 " Similar to the `setup` of some test libraries
 function! g:vmtests.vmtest.first_scope._before()
-  echo "call back to run before each test\n"
+  echo "callback to run before each test\n"
   let self.context_var = 'foo'
 endfunction
 
 " Similar to the `teardown` of some test libraries
 function! g:vmtests.vmtest.first_scope._after()
-  echo "call back to run after each test\n"
+  echo "callback to run after each test\n"
 endfunction
 
 " A test function on the `first_scope` scope

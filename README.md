@@ -24,7 +24,7 @@ On your plugin you create a `vmtest` folder with a test file like:
 
 * tests
 
-```vimscript
+```viml
 " Setup the vmtest for the given plugin
 call vmtest#plugin('vmtest')
 
@@ -34,13 +34,13 @@ let g:vmtests.vmtest.first_scope = {}
 
 " Similar to the `setup` of some test libraries
 function! g:vmtests.vmtest.first_scope._before()
-  echo "call back to run before each test\n"
+  echo "callback to run before each test\n"
   let self.context_var = 'foo'
 endfunction
 
 " Similar to the `teardown` of some test libraries
 function! g:vmtests.vmtest.first_scope._after()
-  echo "call back to run after each test\n"
+  echo "callback to run after each test\n"
 endfunction
 
 " A test function on the `first_scope` scope
@@ -67,13 +67,13 @@ endfunction
 ```text
 => vmtest
  -> first_scope
-call back to run before each test
+callback to run before each test
   » test_bar: Success
-call back to run after each test
-call back to run before each test
+callback to run after each test
+callback to run before each test
   » test_foo: Failed
   ! Expected 'foo' but got 2
-call back to run after each test
+callback to run after each test
  -> second_scope
   » test_bar: Success
 ```
