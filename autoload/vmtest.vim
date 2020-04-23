@@ -26,7 +26,7 @@ function! vmtest#run(...)
   if a:0
     let tests = g:vmtests[a:1]
     let level = 1
-    echon s:title(a:1, 0)
+    echo s:title(a:1, 0)
   else
     let tests = g:vmtests
     let level = 0
@@ -50,7 +50,7 @@ function! vmtest#quit()
 endfunction
 
 function! s:scope(name, dict, level)
-  echon s:title(a:name, a:level)
+  echo s:title(a:name, a:level)
 
   for key in keys(a:dict)
     if index(s:reserved_keys, key) >= 0
