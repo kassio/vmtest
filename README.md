@@ -2,6 +2,8 @@
 
 :warning: alfa version :warning:
 
+[![actions](https://github.com/kassio/vmtest/workflows/main/badge.svg?branch=master)](https://github.com/kassio/vmtest/actions)
+
 The main goal of this plugin is to give a _minimal structure_ to write vimscript
 tests based on the existing `assert_*` functions that already exist.
 
