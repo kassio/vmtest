@@ -1,3 +1,5 @@
+scriptencoding utf8
+
 let s:reserved_keys = [
       \ '_errors',
       \ '_name',
@@ -20,14 +22,22 @@ function! vmtest#run(...)
   endfor
 
   let g:vmtests._errors = []
-  let l:tests = a:0 ? g:vmtests[a:1] : g:vmtests
 
-  for scope in keys(l:tests)
+  if a:0
+    let tests = g:vmtests[a:1]
+    let level = 1
+    echon s:title(a:1, 0)
+  else
+    let tests = g:vmtests
+    let level = 0
+  end
+
+  for scope in keys(tests)
     if index(s:reserved_keys, scope) >= 0
       continue
     end
 
-    call s:scope(scope, l:tests[scope], 0)
+    call s:scope(scope, tests[scope], level)
   endfor
 endfunction
 
@@ -40,25 +50,29 @@ function! vmtest#quit()
 endfunction
 
 function! s:scope(name, dict, level)
-  let l:marker = a:level == 0 ? '=' : '-'
-  echon printf(
-        \ "%s%s> %s\n",
-        \ repeat(' ', a:level),
-        \ l:marker,
-        \ get(a:dict, '_name', a:name)
-        \ )
+  echon s:title(a:name, a:level)
 
-  for l:key in keys(a:dict)
-    if index(s:reserved_keys, l:key) >= 0
+  for key in keys(a:dict)
+    if index(s:reserved_keys, key) >= 0
       continue
     end
 
-    if type(a:dict[l:key]) == v:t_dict
-      call s:scope(l:key, a:dict[l:key], a:level + 1)
+    if type(a:dict[key]) == v:t_dict
+      call s:scope(key, a:dict[key], a:level + 1)
     else
-      call s:execute(l:key, a:dict, a:level)
+      call s:execute(key, a:dict, a:level)
     end
   endfor
+endfunction
+
+function! s:title(name, level)
+  let marker = a:level == 0 ? '=' : '-'
+  return printf(
+        \ "%s%s> %s\n",
+        \ repeat(' ', a:level),
+        \ marker,
+        \ a:name
+        \ )
 endfunction
 
 function! s:execute(key, dict, level)
@@ -75,24 +89,42 @@ endfunction
 
 function! s:execute_test(name, Fn, level)
   if type(a:Fn) != v:t_func
-    echoe printf('"%s" is a %s, it should be a function', a:name, s:type_name(a:Fn))
+    echo s:error(
+          \ a:level,
+          \ '"%s" is a %s, it should be a function',
+          \ a:name,
+          \ s:type_name(a:Fn)
+          \ )
     cquit
   end
 
-  echon printf('%s» %s: ', repeat(' ', a:level), a:name)
   let v:errors = []
 
-  call a:Fn()
+  try
+    call a:Fn()
+  catch /.*E116.*/
+    " assert_notequal raises an exception when it fails
+    " noop
+  endtry
 
   if empty(v:errors)
-    echon "Success\n"
+    echo s:result(a:level, a:name, 'Success')
   else
-    echon "Failed\n"
-    for error in v:errors
-      call add(g:vmtests._errors, error)
-      echon printf("%s  %s\n", repeat(' ', a:level), matchstr(error, ': \zs.*'))
-    endfor
+    echo s:result(a:level, a:name, 'Failed')
+    let g:vmtests._errors += v:errors
+    echo join(map(
+          \ copy(v:errors),
+          \ { _i, error -> s:error(a:level, matchstr(error, '.*: \zs.*')) }
+          \ ), "\n")
   end
+endfunction
+
+function! s:result(level, name, result)
+  return printf('%s » %s: %s', repeat(' ', a:level), a:name, a:result)
+endfunction
+
+function! s:error(level, message, ...)
+  return call('printf', ['%s ! '.a:message, repeat(' ',a:level)] + a:000)
 endfunction
 
 function! s:type_name(value)
