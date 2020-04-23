@@ -1,7 +1,7 @@
 scriptencoding utf8
 
 let s:reserved_keys = [
-      \ '_errors',
+      \ '_tests_counter',
       \ '_name',
       \ '_before',
       \ '_after'
@@ -21,7 +21,7 @@ function! vmtest#run(...) abort
     execute printf('source %s', test_file)
   endfor
 
-  let g:vmtests._errors = []
+  let g:vmtests._tests_counter = { 'tests': 0, 'failed': 0 }
 
   if a:0
     let tests = g:vmtests[a:1]
@@ -39,10 +39,16 @@ function! vmtest#run(...) abort
 
     call s:scope(scope, tests[scope], level)
   endfor
+
+  echo printf("\n\n=> %s Tests Runned.", g:vmtests._tests_counter.tests)
+  echo printf('=> %s Tests Succeed, %s Tests Failed.',
+        \ g:vmtests._tests_counter.tests - g:vmtests._tests_counter.failed,
+        \ g:vmtests._tests_counter.failed
+        \ )
 endfunction
 
 function! vmtest#quit() abort
-  if empty(g:vmtests._errors)
+  if g:vmtests._tests_counter.failed == 0
     qall!
   else
     cquit
@@ -89,16 +95,11 @@ endfunction
 
 function! s:execute_test(name, Fn, level) abort
   if type(a:Fn) != v:t_func
-    echo s:error(
-          \ a:level,
-          \ '"%s" is a %s, it should be a function',
-          \ a:name,
-          \ s:type_name(a:Fn)
-          \ )
-    cquit
+    call s:type_error()
   end
 
   let v:errors = []
+  let g:vmtests._tests_counter.tests += 1
 
   try
     call a:Fn()
@@ -108,22 +109,35 @@ function! s:execute_test(name, Fn, level) abort
   endtry
 
   if empty(v:errors)
-    echo s:result(a:level, a:name, 'Success')
+    echo s:test_result(a:level, a:name, 'Success')
   else
-    echo s:result(a:level, a:name, 'Failed')
-    let g:vmtests._errors += v:errors
-    echo join(map(
-          \ copy(v:errors),
-          \ { _i, error -> s:error(a:level, matchstr(error, '.*: \zs.*')) }
-          \ ), "\n")
+    let g:vmtests._tests_counter.failed += 1
+    echo s:test_result(a:level, a:name, 'Failed')
+    echo s:test_errors(a:level)
   end
 endfunction
 
-function! s:result(level, name, result) abort
+function! s:test_result(level, name, result) abort
   return printf('%s » %s: %s', repeat(' ', a:level), a:name, a:result)
 endfunction
 
-function! s:error(level, message, ...) abort
+function! s:test_errors(level)
+    return join(map(copy(v:errors), { _idx, error ->
+          \   s:error_message(a:level, matchstr(error, '.*: \zs.*'))
+          \ }), "\n")
+endfunction
+
+function! s:type_error(level, name, value)
+    echo s:error_message(
+          \ a:level,
+          \ '"%s" is a %s, it should be a function',
+          \ a:name,
+          \ s:type_name(a:value)
+          \ )
+    cquit
+endfunction
+
+function! s:error_message(level, message, ...) abort
   return call('printf', ['%s ! '.a:message, repeat(' ',a:level)] + a:000)
 endfunction
 

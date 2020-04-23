@@ -1,6 +1,6 @@
 # VMTest - Vim Minimal Test framework
 
-:warning: alfa version :warning:
+:warning: beta version :warning:
 
 [![example](https://github.com/kassio/vmtest/workflows/example/badge.svg?branch=master)](https://github.com/kassio/vmtest/actions)
 
@@ -18,7 +18,7 @@ There are a few reserved keys, used internally:
 * `_name` - Optional custom name of a scope
 * `_before` - Call back to run before each test of the scope
 * `_after` - Call back to run after each test of the scope
-* `_errors` - List of all errors
+* `_tests_counter` - Count of tests that failed
 
 ### Example
 
@@ -78,10 +78,14 @@ callback to run before each test
 callback to run after each test
  -> second_scope
   » test_bar: Success
+
+
+=> 3 Tests Runned.
+=> 2 Tests Succeed, 1 Tests Failed.
 ```
 
 # Contribution
 
-:warning: alfa version :warning:
+:warning: beta version :warning:
 
 Feedback and Pull Requests are welcome.
