@@ -2,6 +2,7 @@
 
 :warning: beta version :warning:
 
+[![lint](https://github.com/kassio/vmtest/workflows/lint/badge.svg?branch=master)](https://github.com/kassio/vmtest/actions?query=workflow%3Alint)
 [![example](https://github.com/kassio/vmtest/workflows/example/badge.svg?branch=master)](https://github.com/kassio/vmtest/actions)
 
 The main goal of this plugin is to give a _minimal structure_ to write vimscript

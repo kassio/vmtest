@@ -1,8 +1,8 @@
-name: vint
+name: lint
 on: [push, pull_request]
 jobs:
 
-  vint:
+  lint:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
