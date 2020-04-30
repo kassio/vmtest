@@ -115,9 +115,13 @@ function! s:test_result(level, name, result) abort
 endfunction
 
 function! s:test_errors(level)
-    return join(map(copy(v:errors), { _idx, error ->
-          \   s:error_message(a:level, matchstr(error, '.*: \zs.*'))
-          \ }), "\n")
+  return join(map(copy(v:errors), { _idx, error ->
+        \   s:error_message(a:level, s:clean_error(error))
+        \ }), "\n")
+endfunction
+
+function! s:clean_error(error)
+  return matchstr(a:error, '[^:]*: \zs.*')
 endfunction
 
 function! s:type_error(level, name, value)
