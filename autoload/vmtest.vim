@@ -24,21 +24,16 @@ function! vmtest#run(...) abort
   let g:vmtests._tests_counter = { 'tests': 0, 'failed': 0 }
 
   if a:0
-    let tests = g:vmtests[a:1]
-    let level = 1
-    echo s:title(a:1, 0)
+    call s:scope(a:1, g:vmtests[a:1], 0)
   else
-    let tests = g:vmtests
-    let level = 0
+    for scope in keys(g:vmtests)
+      if index(s:reserved_keys, scope) >= 0
+        continue
+      end
+
+      call s:scope(scope, g:vmtests[scope], 0)
+    endfor
   end
-
-  for scope in keys(tests)
-    if index(s:reserved_keys, scope) >= 0
-      continue
-    end
-
-    call s:scope(scope, tests[scope], level)
-  endfor
 
   echo printf("\n\n=> %s Tests Runned.", g:vmtests._tests_counter.tests)
   echo printf('=> %s Tests Succeed, %s Tests Failed.',
