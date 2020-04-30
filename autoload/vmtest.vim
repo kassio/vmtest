@@ -35,11 +35,9 @@ function! vmtest#run(...) abort
     endfor
   end
 
-  echo printf("\n\n=> %s Tests Runned.", g:vmtests._tests_counter.tests)
-  echo printf('=> %s Tests Succeed, %s Tests Failed.',
-        \ g:vmtests._tests_counter.tests - g:vmtests._tests_counter.failed,
-        \ g:vmtests._tests_counter.failed
-        \ )
+  echo '---'
+  echo s:summary()
+  echo '---'
 endfunction
 
 function! vmtest#quit() abort
@@ -134,6 +132,15 @@ endfunction
 
 function! s:error_message(level, message, ...) abort
   return call('printf', ['%s ! '.a:message, repeat(' ',a:level)] + a:000)
+endfunction
+
+function! s:summary()
+  return join([
+        \  printf('=> %s Tests Runned.', g:vmtests._tests_counter.tests),
+        \  printf('=> %s Tests Succeed, %s Tests Failed.',
+        \  g:vmtests._tests_counter.tests - g:vmtests._tests_counter.failed,
+        \  g:vmtests._tests_counter.failed)
+        \ ], "\n")
 endfunction
 
 function! s:type_name(value) abort
