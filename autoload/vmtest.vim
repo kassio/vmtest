@@ -125,13 +125,13 @@ function! s:clean_error(error)
 endfunction
 
 function! s:type_error(level, name, value)
-    echo s:error_message(
-          \ a:level,
-          \ '"%s" is a %s, it should be a function',
-          \ a:name,
-          \ s:type_name(a:value)
-          \ )
-    cquit
+  echo s:error_message(
+        \ a:level,
+        \ '"%s" is a %s, it should be a function',
+        \ a:name,
+        \ s:type_name(a:value)
+        \ )
+  cquit
 endfunction
 
 function! s:error_message(level, message, ...) abort
