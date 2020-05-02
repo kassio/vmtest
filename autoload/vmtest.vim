@@ -75,14 +75,18 @@ function! s:title(name, level) abort
 endfunction
 
 function! s:execute(key, dict, level) abort
-  call s:execute_callback(a:dict, '_before')
+  call s:execute_callback(a:dict, '_before', a:key)
   call s:execute_test(a:key, a:dict[a:key], a:level)
-  call s:execute_callback(a:dict, '_after')
+  call s:execute_callback(a:dict, '_after', a:key)
 endfunction
 
-function! s:execute_callback(dict, name) abort
+function! s:execute_callback(dict, name, test) abort
   if has_key(a:dict, a:name)
-    call a:dict[a:name]()
+    try
+      call a:dict[a:name]()
+    catch
+      call logger#error(printf('%s.%s: %s', a:test, a:name, v:exception))
+    endtry
   end
 endfunction
 
@@ -97,8 +101,7 @@ function! s:execute_test(name, Fn, level) abort
   try
     call a:Fn()
   catch /.*E116.*/
-    " assert_notequal raises an exception when it fails
-    " noop
+    call logger#error(printf('%s: %s', a:name, v:exception))
   endtry
 
   if empty(v:errors)
