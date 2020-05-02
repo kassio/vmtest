@@ -113,17 +113,17 @@ function! s:execute_test(name, Fn, level) abort
   end
 endfunction
 
-function! s:test_errors(level)
+function! s:test_errors(level) abort
   return join(map(copy(v:errors), { _idx, error ->
         \   s:error_message(a:level, s:clean_error(error))
         \ }), "\n")
 endfunction
 
-function! s:clean_error(error)
+function! s:clean_error(error) abort
   return matchstr(a:error, '[^:]*: \zs.*')
 endfunction
 
-function! s:type_error(level, name, value)
+function! s:type_error(level, name, value) abort
   echo s:error_message(
         \ a:level,
         \ '"%s" is a %s, it should be a function',
@@ -137,7 +137,7 @@ function! s:error_message(level, message, ...) abort
   return call('printf', ['%s ! '.a:message, repeat(' ',a:level)] + a:000)
 endfunction
 
-function! s:summary()
+function! s:summary() abort
   return join([
         \  printf('=> %s Tests Runned.', g:vmtests._tests_counter.tests),
         \  printf('=> %s Tests Succeed, %s Tests Failed.',
