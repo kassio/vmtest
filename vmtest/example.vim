@@ -29,6 +29,10 @@ endfunction
 " Scope with a custom name
 let g:vmtests.vmtest.second_scope = { '_name': 'My Other Scope' }
 
+function! g:vmtests.vmtest.second_scope._before()
+  let self.test_bar = 1
+endfunction
+
 " A test function on the `second_scope` scope
 function! g:vmtests.vmtest.second_scope.test_bar()
   call assert_equal(1, 1)

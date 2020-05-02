@@ -92,7 +92,7 @@ endfunction
 
 function! s:execute_test(name, Fn, level) abort
   if type(a:Fn) != v:t_func
-    call s:type_error()
+    call s:type_error(a:level, a:name, a:Fn)
   end
 
   let v:errors = []
@@ -105,16 +105,12 @@ function! s:execute_test(name, Fn, level) abort
   endtry
 
   if empty(v:errors)
-    echo s:test_result(a:level, a:name, 'Success')
+    echo printf('%s ✓ %s: %s', repeat(' ', a:level), a:name, 'Success')
   else
     let g:vmtests._tests_counter.failed += 1
-    echo s:test_result(a:level, a:name, 'Failed')
-    echo s:test_errors(a:level)
+    echo printf('%s ✗ %s: %s', repeat(' ', a:level), a:name, 'Failed')
+    echo s:test_errors(a:level + 2)
   end
-endfunction
-
-function! s:test_result(level, name, result) abort
-  return printf('%s » %s: %s', repeat(' ', a:level), a:name, a:result)
 endfunction
 
 function! s:test_errors(level)
