@@ -1,4 +1,4 @@
-function! logger#error(msg)
+function! vmtest#logger#error(msg)
   call s:log('error', a:msg)
 endfunction
 

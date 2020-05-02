@@ -85,7 +85,7 @@ function! s:execute_callback(dict, name, test) abort
     try
       call a:dict[a:name]()
     catch
-      call logger#error(printf('%s.%s: %s', a:test, a:name, v:exception))
+      call vmtest#logger#error(printf('%s.%s: %s', a:test, a:name, v:exception))
     endtry
   end
 endfunction
@@ -101,7 +101,7 @@ function! s:execute_test(name, Fn, level) abort
   try
     call a:Fn()
   catch /.*E116.*/
-    call logger#error(printf('%s: %s', a:name, v:exception))
+    call vmtest#logger#error(printf('%s: %s', a:name, v:exception))
   endtry
 
   if empty(v:errors)
