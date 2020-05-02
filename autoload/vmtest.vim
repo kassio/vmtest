@@ -66,12 +66,7 @@ endfunction
 
 function! s:title(name, level) abort
   let marker = a:level == 0 ? '=' : '-'
-  return printf(
-        \ "%s%s> %s\n",
-        \ repeat(' ', a:level),
-        \ marker,
-        \ a:name
-        \ )
+  return s:indent(a:level, "%s> %s\n", marker, a:name)
 endfunction
 
 function! s:execute(name, dict, level) abort
@@ -111,35 +106,27 @@ function! s:execute_test(name, dict, level) abort
   endtry
 
   if empty(v:errors)
-    echo printf('%s ✓ %s: %s', repeat(' ', a:level), a:name, 'Success')
+    echo s:indent(a:level, '✓ %s: Success', a:name)
   else
     let g:vmtests._tests_counter.failed += 1
-    echo printf('%s ✗ %s: %s', repeat(' ', a:level), a:name, 'Failed')
-    echo s:test_errors(a:level + 2)
+    echo s:indent(a:level, '✗ %s: Failed', a:name)
+    echo join(map(copy(v:errors), { _idx, error ->
+          \   s:indent(a:level + 2, '%s', matchstr(error, '[^:]*: \zs.*'))
+          \ }), "\n")
   end
 endfunction
 
-function! s:test_errors(level) abort
-  return join(map(copy(v:errors), { _idx, error ->
-        \   s:error_message(a:level, s:clean_error(error))
-        \ }), "\n")
-endfunction
-
-function! s:clean_error(error) abort
-  return matchstr(a:error, '[^:]*: \zs.*')
+function! s:indent(level, string, ...)
+  return call('printf', extend([repeat(' ', a:level).a:string], a:000))
 endfunction
 
 function! s:type_error(level, name, value) abort
-  return s:error_message(
-        \ a:level,
+  return s:indent(
+        \ a:level + 3,
         \ '"%s" is a %s, it should be a function',
         \ a:name,
         \ s:type_name(a:value)
         \ )
-endfunction
-
-function! s:error_message(level, message, ...) abort
-  return call('printf', ['%s ! '.a:message, repeat(' ',a:level)] + a:000)
 endfunction
 
 function! s:summary() abort
