@@ -29,6 +29,7 @@ endfunction
 " Scope with a custom name
 let g:vmtests.vmtest.second_scope = { '_name': 'My Other Scope' }
 
+" Cannot use scope variable with a test name
 function! g:vmtests.vmtest.second_scope._before()
   let self.test_bar = 1
 endfunction

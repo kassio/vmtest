@@ -1,5 +1,5 @@
-function! vmtest#logger#error(msg) abort
-  call s:log('error', a:msg)
+function! vmtest#logger#error(string, ...) abort
+  call s:log('error', call('printf', extend([a:string], a:000)))
 endfunction
 
 function! s:log(type, msg) abort

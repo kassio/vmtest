@@ -21,7 +21,7 @@ function! vmtest#run(...) abort
     execute printf('source %s', test_file)
   endfor
 
-  let g:vmtests._tests_counter = { 'tests': 0, 'failed': 0 }
+  let g:vmtests._tests_counter = { 'tests': 0, 'failed': 0, 'erred': 0 }
 
   if a:0
     call s:scope(a:1, g:vmtests[a:1], 0)
@@ -41,10 +41,10 @@ function! vmtest#run(...) abort
 endfunction
 
 function! vmtest#quit() abort
-  if g:vmtests._tests_counter.failed == 0
-    qall!
-  else
+  if g:vmtests._tests_counter.failed >= 0 || g:vmtests._tests_counter.erred >= 0
     cquit
+  else
+    qall!
   end
 endfunction
 
@@ -74,10 +74,19 @@ function! s:title(name, level) abort
         \ )
 endfunction
 
-function! s:execute(key, dict, level) abort
-  call s:execute_callback(a:dict, '_before', a:key)
-  call s:execute_test(a:key, a:dict[a:key], a:level)
-  call s:execute_callback(a:dict, '_after', a:key)
+function! s:execute(name, dict, level) abort
+  let g:vmtests._tests_counter.tests += 1
+
+  call s:execute_callback(a:dict, '_before', a:name)
+
+  if type(a:dict[a:name]) == v:t_func
+    call s:execute_test(a:name, a:dict, a:level)
+  else
+    let g:vmtests._tests_counter.erred += 1
+    echo s:type_error(a:level, a:name, a:dict[a:name])
+  end
+
+  call s:execute_callback(a:dict, '_after', a:name)
 endfunction
 
 function! s:execute_callback(dict, name, test) abort
@@ -85,23 +94,20 @@ function! s:execute_callback(dict, name, test) abort
     try
       call a:dict[a:name]()
     catch
-      call vmtest#logger#error(printf('%s.%s: %s', a:test, a:name, v:exception))
+      call vmtest#logger#error('%s.%s: %s', a:test, a:name, v:exception)
     endtry
   end
 endfunction
 
-function! s:execute_test(name, Fn, level) abort
-  if type(a:Fn) != v:t_func
-    call s:type_error(a:level, a:name, a:Fn)
-  end
-
+function! s:execute_test(name, dict, level) abort
   let v:errors = []
-  let g:vmtests._tests_counter.tests += 1
 
   try
-    call a:Fn()
+    call call(a:dict[a:name], [], a:dict)
   catch /.*E116.*/
-    call vmtest#logger#error(printf('%s: %s', a:name, v:exception))
+    call vmtest#logger#error('%s: %s', a:name, v:exception)
+  catch
+    echo v:exception
   endtry
 
   if empty(v:errors)
@@ -124,13 +130,12 @@ function! s:clean_error(error) abort
 endfunction
 
 function! s:type_error(level, name, value) abort
-  echo s:error_message(
+  return s:error_message(
         \ a:level,
         \ '"%s" is a %s, it should be a function',
         \ a:name,
         \ s:type_name(a:value)
         \ )
-  cquit
 endfunction
 
 function! s:error_message(level, message, ...) abort
@@ -140,9 +145,10 @@ endfunction
 function! s:summary() abort
   return join([
         \  printf('=> %s Tests Runned.', g:vmtests._tests_counter.tests),
-        \  printf('=> %s Tests Succeed, %s Tests Failed.',
+        \  printf('=> %s Tests Succeed, %s Tests Failed, %s Tests Erred.',
         \  g:vmtests._tests_counter.tests - g:vmtests._tests_counter.failed,
-        \  g:vmtests._tests_counter.failed)
+        \  g:vmtests._tests_counter.failed,
+        \  g:vmtests._tests_counter.erred)
         \ ], "\n")
 endfunction
 
