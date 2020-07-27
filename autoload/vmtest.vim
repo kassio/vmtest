@@ -41,7 +41,7 @@ function! vmtest#run(...) abort
 endfunction
 
 function! vmtest#quit() abort
-  if g:vmtests._tests_counter.failed >= 0 || g:vmtests._tests_counter.erred >= 0
+  if g:vmtests._tests_counter.failed > 0 || g:vmtests._tests_counter.erred > 0
     cquit
   else
     qall!
