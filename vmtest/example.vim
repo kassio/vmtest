@@ -18,12 +18,17 @@ endfunction
 
 " A test function on the `first_scope` scope
 function! g:vmtests.vmtest.first_scope.test_foo()
-  call assert_equal(self.context_var, 2)
+  call assert_equal(2, self.context_var)
 endfunction
 
 " A test function on the `first_scope` scope
 function! g:vmtests.vmtest.first_scope.test_bar()
-  call assert_notequal(self.context_var, 2)
+  call assert_notequal(2, self.context_var)
+endfunction
+
+" Exceptions are treated as test errors
+function! g:vmtests.vmtest.first_scope.test_treat_exceptions_as_errors()
+  call assert_equal(0, g:var_that_does_not_exist_in_any_where)
 endfunction
 
 " Scope with a custom name

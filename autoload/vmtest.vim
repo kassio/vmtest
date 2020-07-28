@@ -102,7 +102,7 @@ function! s:execute_test(name, dict, level) abort
   catch /.*E116.*/
     call vmtest#logger#error('%s: %s', a:name, v:exception)
   catch
-    echo v:exception
+    call add(v:errors, v:exception)
   endtry
 
   if empty(v:errors)
